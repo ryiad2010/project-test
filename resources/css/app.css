@@ -1,0 +1,6 @@
+.custom-topbar {
+    background-color: #dbeafe !important; /* Equivalent to bg-blue-100 */
+    border: 2px solid #3b82f6 !important; /* Equivalent to border-blue-500 */
+    border-radius: 4px !important;
+    padding: 4px !important;
+}

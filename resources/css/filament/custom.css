@@ -1,0 +1,20 @@
+/*
+ * Real-world example: Change the Filament topbar background color for custom branding.
+ */
+.fi-topbar {
+    background-color: #1a202c !important; /* A dark charcoal color */
+    /* Ensure text/icons on the topbar remain visible */
+    color: #f7fafc !important;
+}
+
+.fi-topbar nav div > button > svg {
+    color: #f7fafc !important; /* Adjust icon colors if needed */
+}
+
+.fi-topbar .fi-breadcrumbs-item, .fi-topbar .fi-breadcrumbs-item .fi-breadcrumbs-item-label {
+    color: #a0aec0 !important; /* Lighter text for breadcrumbs for contrast */
+}
+
+.fi-topbar .fi-breadcrumbs-item:hover .fi-breadcrumbs-item-label {
+    color: #f7fafc !important;
+}

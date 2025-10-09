@@ -1,0 +1,27 @@
+{
+    "name": "ryiad/filament-toolkit",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ryiad\\FilamentToolkit\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ryiad",
+            "email": "ryiad2010@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "filament/support": "^3.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ryiad\\FilamentToolkit\\FilamentToolkitServiceProvider"
+            ]
+        }
+    }
+}
