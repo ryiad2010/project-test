@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\View\View;
 
 class BillingRecordResource extends Resource
 {
@@ -74,6 +75,7 @@ class BillingRecordResource extends Resource
                                     ->required()
                                     ->columnSpan(2),
 
+
                                 Forms\Components\TextInput::make('quantity')
                                     ->numeric()
                                     ->default(1)
@@ -116,6 +118,13 @@ class BillingRecordResource extends Resource
 
                         Forms\Components\Textarea::make('notes')
                             ->rows(3),
+                        Forms\Components\Textarea::make('description')
+                            ->rows(3),
+                        Forms\Components\Textarea::make('description2')
+                            ->rows(3),
+
+
+
                     ])
                     ->columns(2),
             ]);
@@ -134,9 +143,14 @@ class BillingRecordResource extends Resource
                     ->label('Customer')
                     ->searchable()
                     ->sortable(),
+                tables\Columns\TextColumn::make('amount')
+                    ->label('amount2')
+                    ->money('YER', divideBy: 100, locale: 'EN')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('formatted_amount')
                     ->label('Amount')
+
                     ->sortable('amount'),
 
                 Tables\Columns\BadgeColumn::make('status')
@@ -150,6 +164,7 @@ class BillingRecordResource extends Resource
                 Tables\Columns\TextColumn::make('due_date')
                     ->label('Due Date')
                     ->date()
+                    ->color('danger')
 
                     ->sortable(),
 
@@ -157,12 +172,27 @@ class BillingRecordResource extends Resource
                     ->label('Paid At')
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('notes')
+                    ->label('Notes')
+                    ->bulleted()
+                    ->badge()
+                    ->separator(','),
+
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Description')
+                    ->formatStateUsing(fn(string $state): View => view(
+                        'filament.tables.columns.description-entry-content',
+                        ['state' => $state],
+                    )),
+                Tables\Columns\TextColumn::make('description2')
+                    ->label('Description2')
+                    ->markdown()
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -211,8 +241,6 @@ class BillingRecordResource extends Resource
                     ->form([
                         Forms\Components\TextInput::make('amount')
                             ->label('Refund Amount')
-                            ->numeric()
-                            ->prefix('$')
                             ->helperText('Leave empty to refund the full amount'),
                     ])
                     ->action(function (BillingRecord $record, array $data) {

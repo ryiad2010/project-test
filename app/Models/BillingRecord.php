@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +23,8 @@ class BillingRecord extends Model
         'due_date',
         'paid_at',
         'notes',
+        'description',
+        'description2',
     ];
 
     protected $casts = [
@@ -39,7 +42,7 @@ class BillingRecord extends Model
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => number_format($this->amount, 2) . ' ' . $this->currency
+            get: fn() => number_format($this->amount, 2) . ' ' . $this->currency
         );
     }
 

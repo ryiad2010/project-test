@@ -9,8 +9,11 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\VerticalAlignment;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Table;
 
 
@@ -49,6 +52,9 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(isIndividual: true, isGlobal: false)
+                    ->wrapHeader()
+                    ->grow()
+                    ->verticalAlignment(VerticalAlignment::End)
                     ->action(
                         Action::make('select')->requiresConfirmation()
                             ->action(function ($record): void {
@@ -58,29 +64,36 @@ class UserResource extends Resource
                                     ->send();
                             })
                     ),
+                ColumnGroup::make('Email Information')->columns([
 
+                    Tables\Columns\TextColumn::make('email')
+                        ->searchable()
+                        ->verticalAlignment(VerticalAlignment::End)
+                        ->tooltip('Official Email')
+                        ->prefix('https://')
+                        ->suffix('.com')
+                        ->width('10%')
+                        ->extraAttributes(['class' => 'bg-gray-200'])
+                        ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
+                        ->openUrlInNewTab(),
 
+                    Tables\Columns\IconColumn::make('is_action')
+                        ->boolean(),
+                    Tables\Columns\TextColumn::make('email_verified_at')
+                        ->dateTime()
+                        ->wrapHeader()
+                        ->placeholder('No description.')
+                        ->sortable()
+                        ->visible(filament('ryiad-toolkit')->hasEmailVerifiedAt()),
 
-
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
-                    ->openUrlInNewTab(),
-
-
-                Tables\Columns\IconColumn::make('is_action')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    //->default(now())
-                    ->placeholder('No description.')
-                    ->sortable()
-                    ->visible(filament('ryiad-toolkit')->hasEmailVerifiedAt()),
+                ])->alignment(Alignment::Center)
+                    ->wrapHeader(),
                 Tables\Columns\IconColumn::make('is_admin')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
+                    ->since()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
@@ -92,6 +105,11 @@ class UserResource extends Resource
             ->searchPlaceholder('Search (ID, Name)')
             ->persistSearchInSession()
             ->persistColumnSearchesInSession()
+            ->toggleColumnsTriggerAction(
+                fn(Action $action) => $action
+                    ->button()
+                    ->label('Toggle columns'),
+            )
 
             ->persistSortInSession()
             ->filters([
