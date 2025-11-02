@@ -10,10 +10,13 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\FontFamily;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 
 
@@ -50,7 +53,17 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('name')
+                    ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
+                    ->weight(FontWeight::Bold)
+                    ->fontFamily(FontFamily::Serif)
+                    ->copyable()
+                    ->copyMessage('Name has been copied')
+                    ->copyableState(fn(string $state): string => "URL: {$state}")
+
+                    ->copyMessageDuration(1500)
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->wrapHeader()
                     ->grow()
@@ -99,6 +112,12 @@ class UserResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('status')
+                    ->icon(fn(string $state): string => match ($state) {
+                        'draft' => 'heroicon-o-pencil',
+                        'reviewing' => 'heroicon-o-clock',
+                        'published' => 'heroicon-o-check-circle',
+                    })
             ])->searchOnBlur()
             ->defaultSort('created_at', 'desc')
             ->defaultSortOptionLabel('Recently created')
