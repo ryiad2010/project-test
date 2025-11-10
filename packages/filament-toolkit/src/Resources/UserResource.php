@@ -102,7 +102,9 @@ class UserResource extends Resource
                 ])->alignment(Alignment::Center)
                     ->wrapHeader(),
                 Tables\Columns\IconColumn::make('is_admin')
-                    ->boolean(),
+                    ->boolean()
+                    ->trueColor('info')
+                    ->falseColor('warning'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -118,6 +120,13 @@ class UserResource extends Resource
                         'reviewing' => 'heroicon-o-clock',
                         'published' => 'heroicon-o-check-circle',
                     })
+                    ->color(fn(string $state): string => match ($state) {
+                        'draft' => 'info',
+                        'reviewing' => 'warning',
+                        'published' => 'success',
+                        default => 'gray',
+                    })
+                    ->size(IconColumn\IconColumnSize::ExtraLarge)
             ])->searchOnBlur()
             ->defaultSort('created_at', 'desc')
             ->defaultSortOptionLabel('Recently created')

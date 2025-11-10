@@ -9,6 +9,7 @@
         "php": "^8.2",
         "filament/filament": "^3.2",
         "filament/notifications": "^3.2",
+        "filament/tables": "v3.3.34",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "ryiad/filament-toolkit": "*"

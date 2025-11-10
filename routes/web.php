@@ -5,6 +5,7 @@ use App\Components\TextInput;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Filament\CacheController;
 use App\Livewire\DemoForm;
+use App\Livewire\DemoTable;
 use App\Livewire\TestForm;
 
 Route::post('/filament/clear-cache', [CacheController::class, 'clear'])
@@ -17,4 +18,5 @@ Route::post('/filament/clear-cache', [CacheController::class, 'clear'])
 
  */
 Route::get('/demo', TestForm::class);
-Route::get('/demo2',DemoForm::class);
+Route::get('/demo2', DemoForm::class);
+Route::get('/demo3', DemoTable::class);

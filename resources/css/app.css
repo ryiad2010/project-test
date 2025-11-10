@@ -4,3 +4,7 @@
     border-radius: 4px !important;
     padding: 4px !important;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
