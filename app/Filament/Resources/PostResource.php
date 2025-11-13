@@ -68,6 +68,10 @@ class PostResource extends Resource
                     ->expandableLimitedList(),
 
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('comments_count')->counts('comments'),
+                Tables\Columns\TextColumn::make('comments_exists')->exists('comments'),
+                Tables\Columns\TextColumn::make('comments_max_id')->max('comments', 'id'),
+
             ])
             ->filters([
                 //
