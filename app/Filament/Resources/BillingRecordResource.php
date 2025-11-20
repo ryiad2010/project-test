@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
+use Filament\Tables\Actions\Action;
 
 class BillingRecordResource extends Resource
 {
@@ -209,7 +210,13 @@ class BillingRecordResource extends Resource
                             ->where('status', 'pending')
                             ->where('due_date', '<', now())
                     ),
-            ])
+            ])->deferFilters()
+            ->filtersApplyAction(
+                fn(Action $action) => $action
+                    ->link()
+                    ->label('Save filters to table'),
+            )
+            ->deselectAllRecordsWhenFiltered(false)
             ->actions([
                 Tables\Actions\EditAction::make(),
 
