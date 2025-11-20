@@ -8,10 +8,12 @@ use App\Filament\Resources\PostResource\RelationManagers\CommentsRelationManager
 use App\Filament\Resources\PostResource\RelationManagers\TagsRelationManager;
 use App\Models\Post;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -74,7 +76,9 @@ class PostResource extends Resource
 
             ])
             ->filters([
-                //
+                Filter::make('is_featured')
+                    ->modifyFormFieldUsing(fn(Checkbox $field) => $field->inline(false))
+                    
             ])
             ->actions([
                 //   Tables\Actions\EditAction::make(),
