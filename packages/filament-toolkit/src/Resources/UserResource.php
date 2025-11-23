@@ -17,8 +17,9 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
@@ -141,7 +142,15 @@ class UserResource extends Resource
 
             ->persistSortInSession()
             ->filters([
-                //
+                Filter::make('only_my_team')
+                    ->label('Only my team')
+                    ->query(function (Builder $query, array $data, $livewire = null) {
+                        dd($livewire);
+                        if ($livewire && property_exists($livewire, 'currentTeamId') && $livewire->currentTeamId) {
+                            return $query->where('team_id', $livewire->currentTeamId);
+                        }
+                        return $query;
+                    }),
             ])
             ->actions([
                 //     Tables\Actions\EditAction::make(),
