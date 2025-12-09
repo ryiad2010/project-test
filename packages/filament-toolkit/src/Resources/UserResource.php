@@ -18,8 +18,12 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use App\Filament\Filters\Operators\StartsWithOperator;
+use Filament\Tables\Filters\QueryBuilder;
 
 class UserResource extends Resource
 {
@@ -145,16 +149,47 @@ class UserResource extends Resource
                 Filter::make('only_my_team')
                     ->label('Only my team')
                     ->query(function (Builder $query, array $data, $livewire = null) {
-                        dd($livewire);
+
                         if ($livewire && property_exists($livewire, 'currentTeamId') && $livewire->currentTeamId) {
                             return $query->where('team_id', $livewire->currentTeamId);
                         }
                         return $query;
                     }),
+                Filter::make('smart_recent')
+                    ->label('Smart Recent Records')
+                    ->toggle()
+                    ->query(function (Request $request, Builder $query, array $data, Table $table) {
+                        dd('1' || $request->query('tableFilters', []));
+                        $perPage = $table->getRecordsPerPage();
+                        // dd($perPage);
+
+                        // Change logic dynamically
+                        if ($perPage <= 10) {
+                            $days = 1;
+                        } elseif ($perPage <= 50) {
+                            $days = 7;
+                        } else {
+                            $days = 30;
+                        }
+
+                        return $query->where('created_at', '>=', now()->subDays($days));
+                    }),
+                TernaryFilter::make('is_admin')
+                    ->placeholder('All users')
+                    ->trueLabel('Admin users')
+                    ->falseLabel('Not Admin users'),
+                QueryBuilder::make('custom')
+                    ->constraints([
+                        QueryBuilder\Constraints\TextConstraint::make('name')
+                            ->label('Employee Name')
+                            ->operators([
+                                StartsWithOperator::class, // ← your custom operator
+
+                            ]),
+
+                    ])
             ])
-            ->actions([
-                //     Tables\Actions\EditAction::make(),
-            ])
+            ->actions([])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
