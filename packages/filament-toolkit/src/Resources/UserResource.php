@@ -23,7 +23,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Filament\Filters\Operators\StartsWithOperator;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\Operators\Operator;
 
 class UserResource extends Resource
 {
@@ -181,14 +184,31 @@ class UserResource extends Resource
                 QueryBuilder::make('custom')
                     ->constraints([
                         QueryBuilder\Constraints\TextConstraint::make('name')
-                            ->label('Employee Name')
+                            ->label('User Name')
+                            ->icon('heroicon-o-magnifying-glass') // Add unique identifier
                             ->operators([
                                 StartsWithOperator::class, // ← your custom operator
 
                             ]),
+                        Constraint::make('subscribed')
+                            ->label('Subscribed')
+                            ->icon('heroicon-o-bell')
+                            ->operators([
+                                Operator::make('subscribed')
+                                    ->label(fn(bool $isInverse): string => $isInverse ? 'Not subscribed' : 'Subscribed')
+                                    ->summary(fn(bool $isInverse): string => $isInverse ? 'Users without active subscription' : 'Users with active subscription')
+                                    ->baseQuery(
+                                        fn(Builder $query, bool $isInverse) =>
+                                        // use whereHas when normal, whereDoesntHave when inverted
+                                        $query->{$isInverse ? 'whereDoesntHave' : 'whereHas'}(
+                                            'subscriptions',
+                                            fn(Builder $q) => $q->where('status', 'active') // adjust status as needed
+                                        )
+                                    ),
+                            ]),
 
                     ])
-            ])
+                        ],layout: FiltersLayout::AboveContentCollapsible)
             ->actions([])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

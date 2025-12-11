@@ -7,14 +7,19 @@ use Illuminate\Database\Eloquent\Builder;
 
 class StartsWithOperator extends Operator
 {
+
+
+
+
     public function getName(): string
     {
-        return 'app_starts_with';
+        return 'app_starts_with_operator';
     }
+
 
     public function getLabel(): string
     {
-        return 'Start With string';
+        return 'Start With string [' . spl_object_hash($this) . ']';
     }
 
     public function apply(Builder $query, string $qualifiedColumn): Builder

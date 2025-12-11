@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser, HasName
 {
@@ -52,6 +53,12 @@ class User extends Authenticatable implements FilamentUser, HasName
             'password' => 'hashed',
         ];
     }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(\App\Models\Subscription::class);
+    }
+
 
     public function canAccessPanel(Panel $panel): bool
     {
