@@ -106,6 +106,10 @@ class PostResource extends Resource
                             fn($q, $title) => $q->where('title', 'like', "%{$title}%"),
                         )
                     )
+                    ->indicateUsing(
+                        fn(array $data) =>
+                        $data['title'] ? "Title contains: {$data['title']}" : null
+                    )
 
 
             ])
