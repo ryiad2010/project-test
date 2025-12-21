@@ -9,13 +9,13 @@ use App\Filament\Resources\PostResource\RelationManagers\TagsRelationManager;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
@@ -76,10 +76,26 @@ class PostResource extends Resource
 
             ])
             ->filters([
-                Filter::make('is_featured')
-                    ->modifyFormFieldUsing(fn(Checkbox $field) => $field->inline(false))
-                    
+                Filter::make('is_featured'),
+                //  ->modifyFormFieldUsing(fn(Checkbox $field) => $field->inline(false)),
+                Filter::make('created_at'),
+                Filter::make('title'),
+
+
             ])
+            ->filtersFormColumns(2)
+            ->filtersFormSchema(fn(array $filters): array => [
+                Section::make('Visibility')
+                    ->description('These filters affect the visibility of the records in the table.')
+                    ->schema([
+                        $filters['is_featured'],
+                        $filters['created_at'],
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
+                $filters['title'],
+            ])
+
             ->actions([
                 //   Tables\Actions\EditAction::make(),
             ])
