@@ -78,8 +78,34 @@ class PostResource extends Resource
             ->filters([
                 Filter::make('is_featured'),
                 //  ->modifyFormFieldUsing(fn(Checkbox $field) => $field->inline(false)),
-                Filter::make('created_at'),
-                Filter::make('title'),
+                Filter::make('created_at')->form([
+                    Forms\Components\DatePicker::make('created_at'),
+                ])
+                    ->query(
+                        fn($query, $data) =>
+                        $query->when(
+                            $data['created_at'],
+                            fn($q, $date) => $q->whereDate('created_at', $date),
+                        )
+                    )
+                    ->indicateUsing(function (array $data): ?string {
+                        if (! $data['created_at']) {
+                            return null;
+                        }
+
+                        return 'Created at: ' . \Carbon\Carbon::parse($data['created_at'])->toFormattedDateString();
+                    }),
+                Filter::make('title')
+                    ->form([
+                        Forms\Components\TextInput::make('title'),
+                    ])
+                    ->query(
+                        fn($query, $data) =>
+                        $query->when(
+                            $data['title'],
+                            fn($q, $title) => $q->where('title', 'like', "%{$title}%"),
+                        )
+                    )
 
 
             ])
