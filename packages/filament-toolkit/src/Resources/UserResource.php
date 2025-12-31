@@ -27,6 +27,9 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Operators\Operator;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
+
 
 class UserResource extends Resource
 {
@@ -60,6 +63,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->selectable()
             ->columns([
                 Tables\Columns\TextColumn::make('index')
                     ->rowIndex(),
@@ -83,7 +87,8 @@ class UserResource extends Resource
                                     ->title('Post selected successfully!' . $record->name)
                                     ->success()
                                     ->send();
-                            })
+                            }),
+
                     ),
                 ColumnGroup::make('Email Information')->columns([
 
@@ -208,8 +213,19 @@ class UserResource extends Resource
                             ]),
 
                     ])
-                        ],layout: FiltersLayout::AboveContentCollapsible)
-            ->actions([])
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->actions([
+                Action::make('copyToSelected')
+                    ->accessSelectedRecords()
+                    ->action(function (Model $record, Collection $selectedRecords) {
+                        
+                        $selectedRecords->each(
+                            fn(Model $selectedRecord) => $selectedRecord->update([
+                                'is_admin' => $record->is_admin,
+                            ]),
+                        );
+                    }),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
