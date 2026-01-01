@@ -14,6 +14,8 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 
@@ -127,8 +129,15 @@ class PostResource extends Resource
             ])
 
             ->actions([
+                Action::make('edit')
+                    ->label('Custom Edit')
+                    ->url(fn(Post $record) => static::getUrl('edit', ['record' => $record]))
+                    ->openUrlInNewTab(),
+                Action::make('delete')
+                    ->requiresConfirmation()
+                    ->action(fn(Post $record) => $record->delete())
                 //   Tables\Actions\EditAction::make(),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
