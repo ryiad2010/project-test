@@ -64,7 +64,10 @@ class PostResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('title')->searchable()->sortable()
+                    ->action(function (Post $record, $livewire): void {
+                        $livewire->dispatch('open-post-edit-modal', post: $record->getKey());
+                    }),
                 Tables\Columns\TextColumn::make('comments.body')
                     ->listWithLineBreaks()
                     ->bulleted()

@@ -8,6 +8,9 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListPosts extends ListRecords
 {
+    protected $listeners = [
+        'open-post-edit-modal' => 'openEditModal',
+    ];
     protected static string $resource = PostResource::class;
 
     protected function getHeaderActions(): array
@@ -15,5 +18,10 @@ class ListPosts extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+    public function openEditModal(int $post): void
+    {
+
+        dd($post);
     }
 }
