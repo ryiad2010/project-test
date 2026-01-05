@@ -23,6 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Filament\Filters\Operators\StartsWithOperator;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
@@ -71,11 +72,10 @@ class UserResource extends Resource
                     ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
                     ->weight(FontWeight::Bold)
                     ->fontFamily(FontFamily::Serif)
-                    ->copyable()
-                    ->copyMessage('Name has been copied')
-                    ->copyableState(fn(string $state): string => "URL: {$state}")
-
-                    ->copyMessageDuration(1500)
+                    //   ->copyable()
+                    //    ->copyMessage('Name has been copied')
+                    // ->copyableState(fn(string $state): string => "URL: {$state}")
+                    //  ->copyMessageDuration(1500)
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->wrapHeader()
                     ->grow()
@@ -131,7 +131,7 @@ class UserResource extends Resource
                     ->icon(fn(string $state): string => match ($state) {
                         'draft' => 'heroicon-o-pencil',
                         'reviewing' => 'heroicon-o-clock',
-                        'published' => 'heroicon-o-check-circle',
+                        'approved' => 'heroicon-o-check-circle',
                     })
                     ->color(fn(string $state): string => match ($state) {
                         'draft' => 'info',
@@ -218,7 +218,7 @@ class UserResource extends Resource
                 Action::make('copyToSelected')
                     ->accessSelectedRecords()
                     ->action(function (Model $record, Collection $selectedRecords) {
-                        
+
                         $selectedRecords->each(
                             fn(Model $selectedRecord) => $selectedRecord->update([
                                 'is_admin' => $record->is_admin,
@@ -229,8 +229,23 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    BulkAction::make('approve')
+                        ->label('Approve selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+
+                            $records->each(function ($record) {
+                                $record->status = 'approved';
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion()
+
                 ]),
-            ]);
+            ])->checkIfRecordIsSelectableUsing(
+                fn(Model $record): bool => $record->status === 'approved',
+            )->selectCurrentPageOnly();
     }
 
     public static function getRelations(): array
