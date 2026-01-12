@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Filament\Filters\Operators\StartsWithOperator;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
@@ -68,40 +70,44 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('index')
                     ->rowIndex(),
-                Tables\Columns\TextColumn::make('name')
-                    ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
-                    ->weight(FontWeight::Bold)
-                    ->fontFamily(FontFamily::Serif)
-                    //   ->copyable()
-                    //    ->copyMessage('Name has been copied')
-                    // ->copyableState(fn(string $state): string => "URL: {$state}")
-                    //  ->copyMessageDuration(1500)
-                    ->searchable(isIndividual: true, isGlobal: false)
-                    ->wrapHeader()
-                    ->grow()
-                    ->verticalAlignment(VerticalAlignment::End)
-                    ->action(
-                        Action::make('select')->requiresConfirmation()
-                            ->action(function ($record): void {
-                                Notification::make()
-                                    ->title('Post selected successfully!' . $record->name)
-                                    ->success()
-                                    ->send();
-                            }),
+                Panel::make([
+                    Stack::make([
+                        Tables\Columns\TextColumn::make('name')
+                            ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
+                            ->weight(FontWeight::Bold)
+                            ->fontFamily(FontFamily::Serif)
+                            //   ->copyable()
+                            //    ->copyMessage('Name has been copied')
+                            // ->copyableState(fn(string $state): string => "URL: {$state}")
+                            //  ->copyMessageDuration(1500)
+                            ->searchable(isIndividual: true, isGlobal: false)
+                            ->wrapHeader()
+                            ->grow()
+                            ->verticalAlignment(VerticalAlignment::End)
+                            ->action(
+                                Action::make('select')->requiresConfirmation()
+                                    ->action(function ($record): void {
+                                        Notification::make()
+                                            ->title('Post selected successfully!' . $record->name)
+                                            ->success()
+                                            ->send();
+                                    }),
 
-                    ),
-                ColumnGroup::make('Email Information')->columns([
+                            ),
+                        ColumnGroup::make('Email Information')->columns([
 
-                    Tables\Columns\TextColumn::make('email')
-                        ->searchable()
-                        ->verticalAlignment(VerticalAlignment::End)
-                        ->tooltip('Official Email')
-                        ->prefix('https://')
-                        ->suffix('.com')
-                        ->width('10%')
-                        ->extraAttributes(['class' => 'bg-gray-200'])
-                        ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
-                        ->openUrlInNewTab(),
+                            Tables\Columns\TextColumn::make('email')
+                                ->searchable()
+                                ->verticalAlignment(VerticalAlignment::End)
+                                ->tooltip('Official Email')
+                                ->prefix('https://')
+                                ->suffix('.com')
+                                ->width('10%')
+                                ->extraAttributes(['class' => 'bg-gray-200'])
+                                ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
+                                ->openUrlInNewTab(),
+                        ]),
+                    ])->collapsible(),
 
                     Tables\Columns\IconColumn::make('is_action')
                         ->boolean(),
