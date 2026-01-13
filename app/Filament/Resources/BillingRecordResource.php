@@ -15,6 +15,8 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
 
 class BillingRecordResource extends Resource
 {
@@ -135,6 +137,7 @@ class BillingRecordResource extends Resource
     {
         return $table
             ->columns([
+
                 Tables\Columns\TextColumn::make('invoice_number')
                     ->label('Invoice #')
                     ->searchable()
@@ -144,6 +147,7 @@ class BillingRecordResource extends Resource
                     ->label('Customer')
                     ->searchable()
                     ->sortable(),
+
                 tables\Columns\TextColumn::make('amount')
                     ->label('amount2')
                     ->money('YER', divideBy: 100, locale: 'EN')
