@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Filament\Filters\Operators\StartsWithOperator;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
@@ -66,58 +67,22 @@ class UserResource extends Resource
         return $table
             ->selectable()
             ->columns([
-                Tables\Columns\TextColumn::make('index')
-                    ->rowIndex(),
-                Tables\Columns\TextColumn::make('name')
-                    ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
-                    ->weight(FontWeight::Bold)
-                    ->fontFamily(FontFamily::Serif)
-                    //   ->copyable()
-                    //    ->copyMessage('Name has been copied')
-                    // ->copyableState(fn(string $state): string => "URL: {$state}")
-                    //  ->copyMessageDuration(1500)
-                    ->searchable(isIndividual: true, isGlobal: false)
-                    ->wrapHeader()
-                    ->grow()
+
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
                     ->verticalAlignment(VerticalAlignment::End)
-                    ->action(
-                        Action::make('select')->requiresConfirmation()
-                            ->action(function ($record): void {
-                                Notification::make()
-                                    ->title('Post selected successfully!' . $record->name)
-                                    ->success()
-                                    ->send();
-                            }),
+                    ->tooltip('Official Email')
+                    ->prefix('https://')
+                    ->suffix('.com')
+                    ->width('10%')
+                    ->extraAttributes(['class' => 'bg-gray-200'])
+                    ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
+                    ->openUrlInNewTab(),
 
-                    ),
-                ColumnGroup::make('Email Information')->columns([
+                View::make('users.table.collapsible-row-content')
+                    ->collapsible(),
 
-                    Tables\Columns\TextColumn::make('email')
-                        ->searchable()
-                        ->verticalAlignment(VerticalAlignment::End)
-                        ->tooltip('Official Email')
-                        ->prefix('https://')
-                        ->suffix('.com')
-                        ->width('10%')
-                        ->extraAttributes(['class' => 'bg-gray-200'])
-                        ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
-                        ->openUrlInNewTab(),
 
-                    Tables\Columns\IconColumn::make('is_action')
-                        ->boolean(),
-                    Tables\Columns\TextColumn::make('email_verified_at')
-                        ->dateTime()
-                        ->wrapHeader()
-                        ->placeholder('No description.')
-                        ->sortable()
-                        ->visible(filament('ryiad-toolkit')->hasEmailVerifiedAt()),
-
-                ])->alignment(Alignment::Center)
-                    ->wrapHeader(),
-                Tables\Columns\IconColumn::make('is_admin')
-                    ->boolean()
-                    ->trueColor('info')
-                    ->falseColor('warning'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
