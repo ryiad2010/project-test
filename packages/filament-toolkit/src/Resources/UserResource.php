@@ -80,6 +80,10 @@ class UserResource extends Resource
                     ->openUrlInNewTab(),
 
                 View::make('users.table.collapsible-row-content')
+                    ->components([
+                        Tables\Columns\TextColumn::make('email')
+                            ->icon('heroicon-m-envelope'),
+                    ])
                     ->collapsible(),
 
 
