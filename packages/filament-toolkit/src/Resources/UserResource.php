@@ -24,7 +24,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Filament\Filters\Operators\StartsWithOperator;
 use Filament\Tables\Actions\BulkAction;
+<<<<<<< HEAD
 use Filament\Tables\Columns\Layout\View;
+=======
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
+>>>>>>> e947dded9da41cdd8a86e26d362ecaa6a11aac08
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\Constraint;
@@ -67,6 +72,7 @@ class UserResource extends Resource
         return $table
             ->selectable()
             ->columns([
+<<<<<<< HEAD
 
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
@@ -86,6 +92,48 @@ class UserResource extends Resource
                     ])
                     ->collapsible(),
 
+=======
+                Tables\Columns\TextColumn::make('index')
+                    ->rowIndex(),
+                Panel::make([
+                    Stack::make([
+                        Tables\Columns\TextColumn::make('name')
+                            ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
+                            ->weight(FontWeight::Bold)
+                            ->fontFamily(FontFamily::Serif)
+                            //   ->copyable()
+                            //    ->copyMessage('Name has been copied')
+                            // ->copyableState(fn(string $state): string => "URL: {$state}")
+                            //  ->copyMessageDuration(1500)
+                            ->searchable(isIndividual: true, isGlobal: false)
+                            ->wrapHeader()
+                            ->grow()
+                            ->verticalAlignment(VerticalAlignment::End)
+                            ->action(
+                                Action::make('select')->requiresConfirmation()
+                                    ->action(function ($record): void {
+                                        Notification::make()
+                                            ->title('Post selected successfully!' . $record->name)
+                                            ->success()
+                                            ->send();
+                                    }),
+
+                            ),
+                        ColumnGroup::make('Email Information')->columns([
+
+                            Tables\Columns\TextColumn::make('email')
+                                ->searchable()
+                                ->verticalAlignment(VerticalAlignment::End)
+                                ->tooltip('Official Email')
+                                ->prefix('https://')
+                                ->suffix('.com')
+                                ->width('10%')
+                                ->extraAttributes(['class' => 'bg-gray-200'])
+                                ->url(fn($record): string => route('filament.admin.resources.users.edit', $record))
+                                ->openUrlInNewTab(),
+                        ]),
+                    ])->collapsible(),
+>>>>>>> e947dded9da41cdd8a86e26d362ecaa6a11aac08
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
