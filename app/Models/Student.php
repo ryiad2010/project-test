@@ -13,5 +13,8 @@ class Student extends Model
         'course_name',
         'start_date',
         'end_date',
+        'rate',
+        'score',
+
     ];
 }

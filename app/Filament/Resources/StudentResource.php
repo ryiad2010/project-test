@@ -16,6 +16,8 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\Summarizers\Average;
+use Filament\Tables\Columns\Summarizers\Range;
 use Filament\Tables\Columns\TextColumn;
 
 class StudentResource extends Resource
@@ -46,6 +48,17 @@ class StudentResource extends Resource
 
                                 TextInput::make('phone')
                                     ->tel(),
+
+                                TextInput::make('rate')
+                                    ->numeric()
+                                    ->step(0.01)
+                                    ->prefix('$') // optional
+                                    ->label('Rate')
+                                    ->nullable(),
+                                TextInput::make('score')
+                                    ->numeric()
+                                    ->label('score')
+                                    ->nullable(),
                             ]),
 
                         // RIGHT SECTION
@@ -75,6 +88,7 @@ class StudentResource extends Resource
                     TextColumn::make('name')
                         ->label('Name')
                         ->weight('bold')
+                        ->summarize(Range::make()->minimalTextualDifference())
                         ->searchable(),
 
                     TextColumn::make('email')
@@ -85,6 +99,21 @@ class StudentResource extends Resource
                     TextColumn::make('phone')
                         ->label('Phone')
                         ->placeholder('-'),
+                    TextColumn::make('rate')
+                        ->money('USD') // or remove if not currency
+                        ->sortable()
+                        ->summarize([
+                            Average::make()->label('Summaries Average'),
+                            Range::make()->label('Summaries Range'),
+                        ]),
+                    TextColumn::make('created_at')
+                        ->dateTime()
+                        ->summarize(Range::make()->minimalDateTimeDifference()),
+
+                    TextColumn::make('score')
+                        ->numeric()
+                        ->sortable(),
+
                 ]),
 
                 // -------- RIGHT CARD (Course Info) --------
