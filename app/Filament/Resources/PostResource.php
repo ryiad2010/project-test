@@ -10,11 +10,14 @@ use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -54,6 +57,17 @@ class PostResource extends Resource
                     ->required()
                     ->live(onBlur: true)
                     ->maxLength(255),
+                TextInput::make('category')
+                    ->label('Category'),
+
+                TextInput::make('views_count')
+                    ->label('Views')
+                    ->numeric(),
+
+                TextInput::make('likes_count')
+                    ->label('Likes')
+                    ->numeric(),
+
                 Forms\Components\Textarea::make('content')
                     ->required(),
             ]);
@@ -68,6 +82,26 @@ class PostResource extends Resource
                     ->action(function (Post $record, $livewire): void {
                         $livewire->dispatch('open-post-edit-modal', post: $record->getKey());
                     }),
+                TextColumn::make('category')
+                    ->label('Category')
+                    ->sortable(),
+                TextColumn::make('views_count')
+                    ->label('Views')
+                    ->numeric()
+                    ->summarize(
+                        Sum::make()
+                            ->label('Total Views')
+                    ),
+
+                TextColumn::make('likes_count')
+                    ->label('Likes')
+                    ->numeric()
+                    ->summarize(
+                        Sum::make()
+                            ->label('Total Likes')
+                    ),
+
+
                 Tables\Columns\TextColumn::make('comments.body')
                     ->listWithLineBreaks()
                     ->bulleted()
@@ -79,7 +113,8 @@ class PostResource extends Resource
                 Tables\Columns\TextColumn::make('comments_exists')->exists('comments'),
                 Tables\Columns\TextColumn::make('comments_max_id')->max('comments', 'id'),
 
-            ])
+            ])->defaultGroup('category')
+            //->groupsOnly()
             ->filters([
                 Filter::make('is_featured'),
                 //  ->modifyFormFieldUsing(fn(Checkbox $field) => $field->inline(false)),
