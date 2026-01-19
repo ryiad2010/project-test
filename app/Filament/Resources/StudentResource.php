@@ -18,7 +18,10 @@ use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Columns\Summarizers\Range;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 
 class StudentResource extends Resource
 {
@@ -103,9 +106,11 @@ class StudentResource extends Resource
                         ->money('USD') // or remove if not currency
                         ->sortable()
                         ->summarize([
-                            Average::make()->label('Summaries Average'),
+                            Average::make()->label('Summaries Average')->numeric(decimalPlaces: 2, locale: 'ar'),
                             Range::make()->label('Summaries Range'),
-                        ]),
+                            Sum::make()->money('EUR')->label('Summaries Sum')->prefix('Total volume: ')
+                                ->suffix(new HtmlString(' m&sup3;')),
+                        ])->visible(fn(Builder $query): bool => $query->exists()),
                     TextColumn::make('created_at')
                         ->dateTime()
                         ->summarize(Range::make()->minimalDateTimeDifference()),
