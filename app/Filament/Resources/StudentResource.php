@@ -21,6 +21,7 @@ use Filament\Tables\Columns\Summarizers\Range;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class StudentResource extends Resource
@@ -42,24 +43,45 @@ class StudentResource extends Resource
                         Section::make('Student Information')
                             ->schema([
                                 TextInput::make('name')
+                                    ->extraFieldWrapperAttributes(['class' => 'components-locked'])
+                                    ->helperText(new HtmlString('Your <strong>full name</strong> here, including any middle names.'))
                                     ->required()
                                     ->maxLength(255),
+                                TextInput::make('manufacturer')
+                                    ->datalist([
+                                        'BMW',
+                                        'Ford',
+                                        'Mercedes-Benz',
+                                        'Porsche',
+                                        'Toyota',
+                                        'Tesla',
+                                        'Volkswagen',
+                                    ])->dehydrated(false),
+                                TextInput::make('backgroundColor')
+                                    ->type('color')
+                                    ->dehydrated(false),
 
                                 TextInput::make('email')
+                                    ->helperText(str('Your **full name** here, including any middle names.')->inlineMarkdown()->toHtmlString())
                                     ->email()
                                     ->required(),
 
                                 TextInput::make('phone')
+                                    ->hint(new HtmlString('<a href="/forgotten-password">Forgotten your password?</a>'))
+                                    ->hintColor('danger')
+                                    ->hintIcon('heroicon-m-question-mark-circle', tooltip: 'Need some more information?')
                                     ->tel(),
 
                                 TextInput::make('rate')
                                     ->numeric()
-                                    ->step(0.01)
+                                    ->step(100)
                                     ->prefix('$') // optional
                                     ->label('Rate')
+                                    ->autocomplete('score')
                                     ->nullable(),
                                 TextInput::make('score')
                                     ->numeric()
+                                    ->inputMode('numeric')
                                     ->label('score')
                                     ->nullable(),
                             ]),
@@ -79,12 +101,11 @@ class StudentResource extends Resource
             ]);
     }
 
-    // -------------------------------------------------
-    // TABLE (Panel + Stack)
-    // -------------------------------------------------
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Students')
+            ->description('Manage your Students here.')
             ->columns([
 
                 Split::make([
@@ -139,10 +160,14 @@ class StudentResource extends Resource
                     ])->space(2),
                 ])->collapsible(),
 
-            ])
+            ])->recordUrl(
+                fn(Model $record) =>
+                static::getUrl('view', ['record' => $record])
+            )
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -150,15 +175,13 @@ class StudentResource extends Resource
             ->defaultSort('id', 'desc');
     }
 
-    // -------------------------------------------------
-    // PAGES
-    // -------------------------------------------------
     public static function getPages(): array
     {
         return [
             'index'  => Pages\ListStudents::route('/'),
             'create' => Pages\CreateStudent::route('/create'),
             'edit'   => Pages\EditStudent::route('/{record}/edit'),
+            'view'   => Pages\EditStudent::route('/{record}/view'),
         ];
     }
 }
