@@ -8,8 +8,10 @@ use App\Filament\Resources\StudentResource\Pages;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
 // ✅ CORRECT imports for TABLE layout
@@ -46,6 +48,7 @@ class StudentResource extends Resource
                                     ->extraFieldWrapperAttributes(['class' => 'components-locked'])
                                     ->helperText(new HtmlString('Your <strong>full name</strong> here, including any middle names.'))
                                     ->required()
+                                    ->autocapitalize('words')
                                     ->maxLength(255),
                                 TextInput::make('manufacturer')
                                     ->datalist([
@@ -63,6 +66,10 @@ class StudentResource extends Resource
 
                                 TextInput::make('email')
                                     ->helperText(str('Your **full name** here, including any middle names.')->inlineMarkdown()->toHtmlString())
+                                    ->prefix('https://')
+                                    ->suffix('.com')
+                                    ->suffixIcon('heroicon-m-globe-alt')
+                                    ->suffixIconColor('success')
                                     ->email()
                                     ->required(),
 
@@ -74,6 +81,8 @@ class StudentResource extends Resource
 
                                 TextInput::make('rate')
                                     ->numeric()
+                                    ->mask(RawJs::make('$money($input)'))
+
                                     ->step(100)
                                     ->prefix('$') // optional
                                     ->label('Rate')
@@ -84,6 +93,28 @@ class StudentResource extends Resource
                                     ->inputMode('numeric')
                                     ->label('score')
                                     ->nullable(),
+                                Select::make('technology')
+                                    ->options([
+                                        'tailwind' => '<span class="text-blue-500">Tailwind</span>',
+                                        'alpine' => '<span class="text-green-500">Alpine</span>',
+                                        'laravel' => '<span class="text-red-500">Laravel</span>',
+                                        'livewire' => '<span class="text-pink-500">Livewire</span>',
+                                    ])
+
+                                    ->searchable()
+                                    ->allowHtml(),
+                                Select::make('status')
+                                    ->options([
+                                        'draft' => 'Draft',
+                                        'reviewing' => 'Reviewing',
+                                        'published' => 'Published',
+                                    ])
+                                    ->default('draft')
+                                    ->disableOptionWhen(fn(string $value): bool => $value === 'published')
+                                    ->in(fn(Select $component): array => array_keys($component->getEnabledOptions()))
+                                    ->selectablePlaceholder(false),
+
+
                             ]),
 
                         // RIGHT SECTION
@@ -94,8 +125,17 @@ class StudentResource extends Resource
 
                                 DatePicker::make('start_date')
                                     ->required(),
-
                                 DatePicker::make('end_date'),
+                                TextInput::make('birthday')
+                                    ->mask('99/99/9999')
+                                    ->placeholder('MM/DD/YYYY')
+                                    ->dehydrated(false),
+                                TextInput::make('cardNumber')
+                                    ->mask(RawJs::make(<<<'JS'
+        $input.startsWith('34') || $input.startsWith('37') ? '9999 999999 99999' : '9999 9999 9999 9999'
+    JS))
+                                    ->dehydrated(false),
+
                             ]),
                     ]),
             ]);
@@ -126,6 +166,9 @@ class StudentResource extends Resource
                     TextColumn::make('rate')
                         ->money('USD') // or remove if not currency
                         ->sortable()
+
+
+
                         ->summarize([
                             Average::make()->label('Summaries Average')->numeric(decimalPlaces: 2, locale: 'ar'),
                             Range::make()->label('Summaries Range'),
