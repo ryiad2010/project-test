@@ -5,11 +5,13 @@ namespace App\Filament\Resources;
 use App\Models\Student;
 use Filament\Resources\Resource;
 use App\Filament\Resources\StudentResource\Pages;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Support\RawJs;
 use Filament\Tables;
@@ -50,6 +52,16 @@ class StudentResource extends Resource
                                     ->required()
                                     ->autocapitalize('words')
                                     ->maxLength(255),
+                                TimePicker::make('appointment_at')
+                                    ->datalist([
+                                        '09:00',
+                                        '09:30',
+                                        '10:00',
+                                        '10:30',
+                                        '11:00',
+                                        '11:30',
+                                        '12:00',
+                                    ]),
                                 TextInput::make('manufacturer')
                                     ->datalist([
                                         'BMW',
@@ -103,6 +115,14 @@ class StudentResource extends Resource
 
                                     ->searchable()
                                     ->allowHtml(),
+                                CheckboxList::make('technologies')
+                                    ->options([
+                                        'tailwind' => 'Tailwind CSS',
+                                        'alpine' => 'Alpine.js',
+                                        'laravel' => 'Laravel',
+                                        'livewire' => 'Laravel Livewire',
+                                    ])
+                                    ->disableOptionWhen(fn(string $value): bool => $value === 'livewire'),
                                 Select::make('status')
                                     ->options([
                                         'draft' => 'Draft',
