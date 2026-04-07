@@ -7,6 +7,7 @@ use App\Http\Controllers\Filament\CacheController;
 use App\Livewire\DemoForm;
 use App\Livewire\DemoTable;
 use App\Livewire\TestForm;
+use App\Http\Controllers\PageController;
 
 Route::post('/filament/clear-cache', [CacheController::class, 'clear'])
     ->name('filament.clear-cache');
@@ -20,3 +21,4 @@ Route::post('/filament/clear-cache', [CacheController::class, 'clear'])
 Route::get('/demo', TestForm::class);
 Route::get('/demo2', DemoForm::class);
 Route::get('/demo3', DemoTable::class);
+Route::get('/page/{id}', [PageController::class, 'show']);
