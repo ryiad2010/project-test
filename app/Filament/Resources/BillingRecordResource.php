@@ -35,6 +35,8 @@ class BillingRecordResource extends Resource
                             ->label('Customer')
                             ->relationship('user', 'name')
                             ->searchable()
+                            ->loadingMessage('Loading Users...')
+                            ->searchPrompt('Search Users by their name or email address')
                             ->preload()
                             ->required(),
 
