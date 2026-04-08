@@ -14,7 +14,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Filament\Forms\Components\TagsInput;
 
 class PageResource extends Resource
 {
@@ -29,6 +29,18 @@ class PageResource extends Resource
                 TextInput::make('title')
                     ->label('Page Title')
                     ->required(),
+                TagsInput::make('tags')
+                    ->suggestions([
+                        'tailwindcss',
+                        'alpinejs',
+                        'laravel',
+                        'livewire',
+                    ])->splitKeys(['Tab', ' '])->tagSuffix('%')->reorderable()->color('danger')->dehydrated(false),
+                Textarea::make('description')
+                    //  ->rows(10)
+                    // ->cols(20)
+                    ->autosize()
+                    ->dehydrated(false),
 
                 Builder::make('content')
                     ->blocks([
