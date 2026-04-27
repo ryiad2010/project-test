@@ -4,10 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
-use Filament\Forms;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +19,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TagsInput;
+use Illuminate\Support\Facades\Date;
 
 class PageResource extends Resource
 {
@@ -26,9 +31,27 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')
-                    ->label('Page Title')
+                Section::make('Page Details')
+                    ->columns([
+                        'sm' => 3,
+                        'xl' => 6,
+                        '2xl' => 8,
+                    ])->schema([
+                        TextInput::make('title')
+                            ->label('Page Title')
+                            ->required()
+                            ->columnStart([
+                                'sm' => 2,
+                                'xl' => 3,
+                                '2xl' => 4,
+                            ]),
+                    ]),
+                TextInput::make('website')
+                    ->label('Website URL')
+                    ->activeUrl()
                     ->required(),
+                DatePicker::make('start_date')->after('tomorrow'),
+
                 TagsInput::make('tags')
                     ->suggestions([
                         'tailwindcss',
@@ -41,6 +64,8 @@ class PageResource extends Resource
                     // ->cols(20)
                     ->autosize()
                     ->dehydrated(false),
+                KeyValue::make('meta'),
+
 
                 Builder::make('content')
                     ->blocks([
@@ -81,6 +106,8 @@ class PageResource extends Resource
                                     ->required(),
                             ]),
                     ])->blockNumbers(false)->reorderableWithButtons(),
+
+                ColorPicker::make('color')->rgba()
             ]);
     }
 
