@@ -20,6 +20,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TagsInput;
 use Illuminate\Support\Facades\Date;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Set;
 
 class PageResource extends Resource
 {
@@ -37,6 +39,25 @@ class PageResource extends Resource
                         'xl' => 6,
                         '2xl' => 8,
                     ])->schema([
+                        TextInput::make('age')
+                            ->numeric()       // ensures the input is a number
+                            ->multipleOf(2)
+                            ->suffixAction(
+                                Action::make('copyCostToPrice')
+                                    ->icon('heroicon-m-clipboard')
+                                    ->requiresConfirmation()
+                                    ->action(function (Set $set, $state) {
+                                        $set('price', $state);
+                                    })
+                            )
+                            ->hintAction(
+                                Action::make('copyCostToPrice')
+                                    ->icon('heroicon-m-clipboard')
+                                    ->requiresConfirmation()
+                                    ->action(function (Set $set, $state) {
+                                        $set('price', $state);
+                                    })
+                            ),
                         TextInput::make('title')
                             ->label('Page Title')
                             ->required()
